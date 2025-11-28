@@ -5,10 +5,11 @@ from ruamel.yaml import YAML
 from rich.console import Console
 from rich.text import Text 
 
-from modules.backup import Backup
-from modules.update import Update
+from .modules.backup import Backup
+from .modules.update import Update
 
 def main():
+    # cli configuration
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", help="Path to the configuration file", default="config.yaml")
     args = parser.parse_args()

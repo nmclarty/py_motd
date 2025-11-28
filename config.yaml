@@ -1,5 +1,6 @@
 update:
   source_path: data/
+  generation_count: 5
   inputs:
     - nixpkgs
     - nix-darwin

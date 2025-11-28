@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "py_motd"
+version = "0.0.1"
+
+[project.scripts]
+py_motd = "py_motd.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
