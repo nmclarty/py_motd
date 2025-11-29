@@ -15,7 +15,7 @@ in
         };
         generation_count = mkOption {
           type = types.int;
-          default = 5;
+          default = 3;
           description = "Number of generations to show in the MOTD.";
         };
         inputs = mkOption {
@@ -27,7 +27,7 @@ in
       backup = {
         status_path = mkOption {
           type = types.str;
-          default = "/var/lib/resticprofile/";
+          default = "/var/lib/resticprofile";
           description = "Path to where the resticprofile status files are stored.";
         };
         profiles = mkOption {

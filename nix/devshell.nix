@@ -8,6 +8,7 @@ in
 pkgs.mkShell {
   packages = with pkgs; [
     python313
+    ruff
   ] ++ pythonPkgs;
 
   env = { };
