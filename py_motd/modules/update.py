@@ -88,6 +88,7 @@ class Update:
                 "Generation": self.g["generation"],
                 "Version": self.g["nixosVersion"],
                 "Kernel": self.g["kernelVersion"],
+                "Commit": self.g["configurationRevision"][:7]
             },
             "History": [{g["generation"]: f"{g['age']} ago"} for g in self.generations],
             "Inputs": [{name: f"{age} ago"} for name, age in self.inputs],
