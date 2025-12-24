@@ -1,7 +1,7 @@
 { lib, config, ... }:
 with lib;
 let
-  cfg = config.programs.sops-podman;
+  cfg = config.services.sops-podman;
 in
 {
   options.services.sops-podman = {
