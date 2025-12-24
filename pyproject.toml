@@ -3,15 +3,17 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "py_motd"
+name = "nix-helpers"
 version = "1.0.0"
 dependencies = [
     "ruamel.yaml",
     "rich",
+    "podman",
 ]
 
 [project.scripts]
 py_motd = "py_motd.__main__:main"
+sops_podman = "sops_podman.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

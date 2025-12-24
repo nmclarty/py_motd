@@ -1,10 +1,10 @@
 { lib, inputs, config, pkgs, perSystem, ... }:
 with lib;
 let
-  cfg = config.programs.py_motd;
+  cfg = config.programs.py-motd;
 in
 {
-  options.programs.py_motd = {
+  options.programs.py-motd = {
     enable = mkEnableOption "Enable Python Message of the Day";
     settings = {
       update = {
@@ -39,7 +39,7 @@ in
     };
   };
   config = mkIf cfg.enable {
-    home.packages = [ perSystem.py_motd.default ];
+    home.packages = [ perSystem.nix-helpers.default ];
     xdg.configFile."py_motd/config.yaml".source = (pkgs.formats.yaml { }).generate "config.yaml" cfg.settings;
   };
 }
