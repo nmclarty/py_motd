@@ -1,5 +1,6 @@
 """Simple tool for loading secrets from a YAML file to podman."""
 
+from argparse import ArgumentParser
 from pathlib import Path
 
 from podman import PodmanClient
@@ -19,6 +20,12 @@ def __flatten(d: dict, parent: str = "", sep: str = "__") -> dict:
 
 def main() -> None:
     """Run the main sops_podman utility."""
+    # cli configuration
+    parser = ArgumentParser()
+    parser.add_argument(
+        "-s", "--secret-file", help="Path to the secret file", required=True
+    )
+    args = parser.parse_args()
     yaml = YAML()
 
     with PodmanClient() as client:
@@ -28,7 +35,7 @@ def main() -> None:
             for s in current_secrets:
                 s.remove()
 
-            secrets = __flatten(yaml.load(Path("data/podman.yaml")))
+            secrets = __flatten(yaml.load(Path(args.secret_file)))
             print(f"Adding {len(secrets)} secrets to podman store...")
             for key, val in secrets.items():
                 client.secrets.create(key, val)
