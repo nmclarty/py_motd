@@ -1,8 +1,11 @@
 { pkgs }:
 let
   pythonPkgs = with pkgs.python313Packages; [
+    # py-motd
     ruamel-yaml
     rich
+    # sops-podman
+    podman
   ];
 in
 pkgs.mkShell {
