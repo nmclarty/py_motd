@@ -8,7 +8,7 @@ in
     enable = mkEnableOption "Enable loading sops secrets to podman.";
   };
   config = mkIf cfg.enable {
-    systemd.services.podman-secrets = {
+    systemd.services.sops-podman = {
       description = "Load system managed secrets into the podman secret store";
       before = [ "network-online.target" ];
       wantedBy = [ "network-online.target" ];
