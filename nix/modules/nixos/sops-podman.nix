@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, perSystem, ... }:
 with lib;
 let
   cfg = config.services.sops-podman;
