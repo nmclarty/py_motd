@@ -25,10 +25,16 @@ def main() -> None:
     parser.add_argument(
         "-s", "--secret-file", help="Path to the secret file", required=True
     )
+    parser.add_argument(
+        "-p",
+        "--podman-connection",
+        help="The podman connection string",
+        required=True,
+    )
     args = parser.parse_args()
     yaml = YAML()
 
-    with PodmanClient() as client:
+    with PodmanClient(base_url=args.podman_connection) as client:
         if client.ping():
             current_secrets = client.secrets.list()
             print(f"Removing {len(current_secrets)} secrets from podman store...")

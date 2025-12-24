@@ -11,6 +11,11 @@ in
         type = types.str;
         description = "The path the the encrypted sops file to be loaded from.";
       };
+      podmanConnection = mkOption {
+        type = types.str;
+        default = "/run/podman/podman.sock";
+        description = "The podman connection string to use.";
+      };
     };
   };
   config = mkIf cfg.enable {
