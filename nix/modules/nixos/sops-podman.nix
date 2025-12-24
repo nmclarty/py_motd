@@ -1,3 +1,5 @@
+{ lib, config, ... }:
+with lib;
 let
   cfg = config.programs.sops-podman;
 in
