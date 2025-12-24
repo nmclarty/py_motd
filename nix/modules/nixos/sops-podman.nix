@@ -9,7 +9,7 @@ in
     settings = {
       sopsFile = mkOption {
         types = types.str;
-        description = "The path the the encrypted sops file to be loaded from."
+        description = "The path the the encrypted sops file to be loaded from.";
       };
     };
   };
