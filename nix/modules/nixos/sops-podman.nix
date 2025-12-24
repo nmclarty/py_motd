@@ -8,7 +8,7 @@ in
     enable = mkEnableOption "Enable loading sops secrets to podman.";
     settings = {
       sopsFile = mkOption {
-        types = types.str;
+        type = types.str;
         description = "The path the the encrypted sops file to be loaded from.";
       };
     };
