@@ -13,7 +13,7 @@ in
       };
       podmanConnection = mkOption {
         type = types.str;
-        default = "/run/podman/podman.sock";
+        default = "unix:///run/podman/podman.sock";
         description = "The podman connection string to use.";
       };
     };
@@ -29,7 +29,7 @@ in
       before = [ "network-online.target" ];
       wantedBy = [ "network-online.target" ];
       serviceConfig = {
-        ExecStart = "${perSystem.nix-helpers.default}/bin/sops_podman -s '${config.sops.secrets."sops-podman.yaml".path}' -p '${cfg.settings.podmanConnection}";
+        ExecStart = "${perSystem.nix-helpers.default}/bin/sops_podman -s '${config.sops.secrets."sops-podman.yaml".path}' -p '${cfg.settings.podmanConnection}'";
       };
     };
   };

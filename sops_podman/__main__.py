@@ -44,7 +44,7 @@ def main() -> None:
             secrets = __flatten(yaml.load(Path(args.secret_file)))
             print(f"Adding {len(secrets)} secrets to podman store...")
             for key, val in secrets.items():
-                client.secrets.create(key, val)
+                client.secrets.create(key, str(val))
 
 
 if __name__ == "__main__":
