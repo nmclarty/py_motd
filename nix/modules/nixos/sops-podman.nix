@@ -13,7 +13,7 @@ in
       before = [ "network-online.target" ];
       wantedBy = [ "network-online.target" ];
       serviceConfig = {
-        ExecStart = "${perSystem.nix-helpers.default}/bin/sops-podman";
+        ExecStart = "${perSystem.nix-helpers.default}/bin/sops_podman";
       };
     };
   };
