@@ -24,13 +24,13 @@ in
       sopsFile = cfg.settings.sopsFile;
       key = "";
     };
-    systemd.services.sops-podman = {
-      description = "Load system managed secrets into the podman secret store";
-      before = [ "network-online.target" ];
-      wantedBy = [ "network-online.target" ];
-      serviceConfig = {
-        ExecStart = "${perSystem.nix-helpers.default}/bin/sops_podman -s '${config.sops.secrets."sops-podman.yaml".path}' -p '${cfg.settings.podmanConnection}'";
-      };
+    system.activationScripts.sops-podman = {
+      deps = [ "setupSecrets" ];
+      text = ''
+        ${perSystem.nix-helpers.default}/bin/sops_podman \
+        -s '${config.sops.secrets."sops-podman.yaml".path}' \
+        -p '${cfg.settings.podmanConnection}' || true
+      '';
     };
   };
 }
