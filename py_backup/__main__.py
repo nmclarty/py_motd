@@ -40,6 +40,8 @@ def main() -> None:
     # load the config file
     yaml = YAML()
     config = yaml.load(Path(args.config))
+    Snapshot.zpool = config["zpool"]
+    Snapshot.directory = config["directory"]
     snapshot = [Snapshot(name) for name in config["datasets"]]
 
     # load systemd manager

@@ -23,7 +23,7 @@ in
         description = "A list of zfs datasets that will be backed up.";
       };
 
-      dir = mkOption {
+      directory = mkOption {
         type = types.str;
         default = "/.backup";
         description = "The directory that snapshots will be mounted into for backup.";
