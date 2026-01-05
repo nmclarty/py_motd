@@ -9,12 +9,10 @@ in
     retention = {
       days = mkOption {
         type = types.int;
-        default = 7;
         description = "The amount of days to keep snapshots and backups for";
       };
       weeks = mkOption {
         type = types.int;
-        default = 4;
         description = "The amount of weeks to keep snapshots and backups for";
       };
     };
