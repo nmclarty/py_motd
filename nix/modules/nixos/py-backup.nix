@@ -49,6 +49,7 @@ in
           path = with pkgs; [
             zfs
             util-linux
+            resticprofile
           ];
           serviceConfig = {
             Type = "oneshot";
