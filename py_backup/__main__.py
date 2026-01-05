@@ -6,16 +6,28 @@ from json import loads
 from pystemd.systemd1 import Manager
 from ruamel.yaml import YAML
 
-def cleanup(ds: str, mt: Path) -> None:
-    if mt.is_mount():
-        run(["umount", mt], check=True)
 
-    if run(["zfs", "list", ds], capture_output=True).returncode == 0:
-        run(["zfs", "destroy", ds], check=True)
+class Snapshot:
+    zpool = None
+    directory = None
 
-def snapshot(ds: str, mt: Path) -> None:
-    run(["zfs", "snapshot", ds], check=True)
-    run(["mount", "-t", "zfs", ds, mt])
+    def __init__(self, name: str) -> None:
+        self.name = f"{Snapshot.zpool}/{name}@backup"
+        self.path = Path(f"{Snapshot.directory}/{name}")
+
+    def __str__(self) -> str:
+        return f"{self.name}:{self.path}"
+
+    def cleanup(self) -> None:
+        if self.path.is_mount():
+            run(["umount", self.path], check=True)
+
+        if run(["zfs", "list", self.name], capture_output=True).returncode == 0:
+            run(["zfs", "destroy", self.name], check=True)
+
+    def snapshot(self) -> None:
+        run(["zfs", "snapshot", self.name], check=True)
+        run(["mount", "-t", "zfs", self.name, self.path])
 
 def main() -> None:
     # cli configuration
@@ -28,26 +40,24 @@ def main() -> None:
     # load the config file
     yaml = YAML()
     config = yaml.load(Path(args.config))
+    snapshot = [Snapshot(name) for name in config["datasets"]]
 
     # load systemd manager
     manager = Manager(_autoload=True)
 
     # stop each service for snapshotting
     for service in config["services"]:
-        manager.Manager.StopUnit(bytes(str(service), "utf-8"), b'replace')
+        manager.Manager.StopUnit(bytes(str(service), "utf-8"), b"replace")
 
     # create temporary snapshots for backups
-    for dataset in config["datasets"]:
-        ds = f"{config["zpool"]}/{dataset}@backup"
-        mt = Path(f"{config["dir"]}/{dataset}")
-
-        cleanup(ds, mt)
-        snapshot(ds, mt)
-        print(f"Created snapshot '{ds}' and mounted in '{mt}'")
+    for s in snapshot:
+        s.cleanup()
+        s.snapshot()
+        print(f"Created snapshot '{s}'")
 
     # start each service after snapshotting
     for service in config["services"]:
-        manager.Manager.StartUnit(bytes(str(service), "utf-8"), b'replace')
+        manager.Manager.StartUnit(bytes(str(service), "utf-8"), b"replace")
 
     # # run backups
     # run(
@@ -58,8 +68,10 @@ def main() -> None:
     # )
 
     # clean up temporary snapshots for backups
-    for dataset in config["datasets"]:
-        cleanup(config["dir"], config["zpool"], dataset)
+    for s in snapshot:
+        s.cleanup()
+        print(f"Cleaned up snapshot '{s}'")
+
 
 if __name__ == "__main__":
     main()
