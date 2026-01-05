@@ -46,6 +46,9 @@ in
           description = "Snapshot disks and backup";
           after = [ "network-online.target" ];
           requires = [ "network-online.target" ];
+          path = with pkgs; [
+            zfs
+          ];
           serviceConfig = {
             Type = "oneshot";
             ExecStart = "${perSystem.nix-helpers.default}/bin/py_backup -c ${(pkgs.formats.yaml { }).generate "config.yaml" cfg.settings}";
