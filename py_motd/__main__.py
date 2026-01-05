@@ -33,9 +33,7 @@ def main() -> None:
     # load the config file
     yaml = YAML()
     yaml.indent(sequence=4, offset=2)
-    config_file = Path(args.config).expanduser()
-    with config_file.open(encoding="utf-8") as file:
-        config = yaml.load(file)
+    config = yaml.load(Path(args.config).expanduser())
 
     # output the combined result of each module
     console = Console()
