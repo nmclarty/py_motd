@@ -56,8 +56,8 @@ in
         "restic/remote/access" = { };
         "restic/remote/secret" = { };
       };
-      templates."resticprofile/profiles.yaml" = {
-        path = "/etc/resticprofile/profiles.yaml";
+      templates."resticprofile/profiles.json" = {
+        path = "/etc/resticprofile/profiles.json";
         content =
           let
             settings = {
@@ -93,7 +93,7 @@ in
               };
             };
           in
-          (pkgs.formats.yaml { }).generate "resticprofile-config.yaml" settings;
+          builtins.toJSON settings;
       };
     };
   };
