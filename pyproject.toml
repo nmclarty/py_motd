@@ -14,6 +14,7 @@ dependencies = [
 [project.scripts]
 py_motd = "py_motd.__main__:main"
 sops_podman = "sops_podman.__main__:main"
+py_backup = "py_backup.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
