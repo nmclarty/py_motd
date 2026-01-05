@@ -29,6 +29,8 @@ class Snapshot:
     def snapshot(self) -> None:
         """Create and mount this snapshot."""
         run(["zfs", "snapshot", self.name], check=True)
+
+        self.path.mkdir()
         run(["mount", "-t", "zfs", self.name, self.path], check=True)
 
 
@@ -47,8 +49,10 @@ def main() -> None:
     Snapshot.directory = config["directory"]
     snapshot = [Snapshot(name) for name in config["datasets"]]
 
-    run(["systemctl", "stop"] + config["services"], check=True)
-    print("Stopped services")
+    # stop each service before snapshotting
+    if len(services := config["services"]) != 0:
+        run(["systemctl", "stop"] + services, check=True)
+        print("Stopped services")
 
     # create temporary snapshots for backups
     for s in snapshot:
@@ -61,8 +65,9 @@ def main() -> None:
     print("Created long-term snapshots")
 
     # start each service after snapshotting
-    run(["systemctl", "start"] + config["services"], check=True)
-    print("Started services")
+    if len(services := config["services"]) != 0:
+        run(["systemctl", "start"] + services, check=True)
+        print("Started services")
 
     # run backups
     run(["resticprofile", "backup"], check=True)

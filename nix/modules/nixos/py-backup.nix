@@ -6,6 +6,18 @@ in
 {
   options.services.py-backup = {
     enable = mkEnableOption "Enable system backup services.";
+    retention = {
+      days = mkOption {
+        type = types.int;
+        default = 7;
+        description = "The amount of days to keep snapshots and backups for";
+      };
+      weeks = mkOption {
+        type = types.int;
+        default = 4;
+        description = "The amount of weeks to keep snapshots and backups for";
+      };
+    };
     settings = {
       services = mkOption {
         type = types.listOf types.str;
@@ -34,7 +46,7 @@ in
       };
     };
   };
-  config = mkIf true {
+  config = mkIf cfg.enable {
     systemd = {
       tmpfiles.rules = [
         "d ${cfg.settings.directory}"
@@ -44,8 +56,8 @@ in
         sanoid.serviceConfig.Type = "oneshot";
         backup = {
           description = "Snapshot disks and backup";
-          after = [ "network-online.target" ];
-          requires = [ "network-online.target" ];
+          after = [ "network-online.target" "zfs.target" ];
+          requires = [ "network-online.target" "zfs.target" ];
           path = with pkgs; [
             zfs
             util-linux
@@ -109,8 +121,8 @@ in
                   after-backup = true;
                   tag = true;
                   prune = true;
-                  keep-daily = 7;
-                  keep-weekly = 4;
+                  keep-daily = cfg.retention.days;
+                  keep-weekly = cfg.retention.weeks;
                 };
               };
             };
