@@ -9,7 +9,6 @@ dependencies = [
     "ruamel.yaml",
     "rich",
     "podman",
-    "pystemd",
 ]
 
 [project.scripts]

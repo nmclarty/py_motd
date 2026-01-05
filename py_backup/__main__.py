@@ -47,9 +47,8 @@ def main() -> None:
     Snapshot.directory = config["directory"]
     snapshot = [Snapshot(name) for name in config["datasets"]]
 
-    print(config["services"])
+    run(["systemctl", "stop"] + config["services"], check=True)
     print("Stopped services")
-    exit(0)
 
     # create temporary snapshots for backups
     for s in snapshot:
@@ -58,15 +57,13 @@ def main() -> None:
     print("Created temporary snapshots")
 
     # create long-term snapshots for local recovery
-    manager.Manager.StartUnit(b"sanoid.service", b"replace")
+    run(["systemctl", "start", "sanoid.service"], check=True)
     print("Created long-term snapshots")
 
-    unit = Unit(b"sanoid.service", _autoload=True)
-    print(f"running: {unit.Unit.ActiveState}")
+    print(run(["systemctl", "status", "sanoid.service"], check=True))
 
     # start each service after snapshotting
-    for service in config["services"]:
-        manager.Manager.StartUnit(bytes(str(service), "utf-8"), b"replace")
+    run(["systemctl", "start"] + config["services"], check=True)
     print("Started services")
 
     # run backups
