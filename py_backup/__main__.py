@@ -1,13 +1,14 @@
 from argparse import ArgumentParser
 from pathlib import Path
 from subprocess import run
-from json import loads
 
 from pystemd.systemd1 import Manager
 from ruamel.yaml import YAML
 
 
 class Snapshot:
+    """Simple class for making operations on a zfs snapshot easier."""
+
     zpool = None
     directory = None
 
@@ -19,21 +20,24 @@ class Snapshot:
         return f"{self.name}:{self.path}"
 
     def cleanup(self) -> None:
+        """Unmount and destroy this snapshot."""
         if self.path.is_mount():
             run(["umount", self.path], check=True)
 
-        if run(["zfs", "list", self.name], capture_output=True).returncode == 0:
+        if run(["zfs", "list", self.name], check=False, capture_output=True).returncode == 0:
             run(["zfs", "destroy", self.name], check=True)
 
     def snapshot(self) -> None:
+        """Create and mount this snapshot."""
         run(["zfs", "snapshot", self.name], check=True)
-        run(["mount", "-t", "zfs", self.name, self.path])
+        run(["mount", "-t", "zfs", self.name, self.path], check=True)
+
 
 def main() -> None:
     # cli configuration
     parser = ArgumentParser()
     parser.add_argument(
-        "-c", "--config", help="Path to the configuration file", required=True
+        "-c", "--config", help="Path to the configuration file", required=True,
     )
     args = parser.parse_args()
 
