@@ -26,6 +26,10 @@ in
         default = "/.backup";
         description = "The directory that snapshots will be mounted into for backup.";
       };
+      repository = mkOption {
+        type = types.str;
+        description = "The repository to use for restic backup.";
+      };
     };
   };
   config = mkIf true {
@@ -53,8 +57,8 @@ in
     sops = {
       secrets = {
         "restic/password" = { };
-        "restic/remote/access" = { };
-        "restic/remote/secret" = { };
+        "restic/access_key" = { };
+        "restic/secret_key" = { };
       };
       templates."resticprofile/profiles.json" = {
         path = "/etc/resticprofile/profiles.json";
@@ -64,11 +68,11 @@ in
               version = "1";
 
               default = {
-                repository = "s3:${config.private.restic.remote.host}/${config.networking.hostName}-restic";
+                inherit (cfg.settings) repository;
                 password-file = config.sops.secrets."restic/password".path;
                 env = {
-                  AWS_ACCESS_KEY_ID = config.sops.placeholder."restic/remote/access";
-                  AWS_SECRET_ACCESS_KEY = config.sops.placeholder."restic/remote/secret";
+                  AWS_ACCESS_KEY_ID = config.sops.placeholder."restic/access_key";
+                  AWS_SECRET_ACCESS_KEY = config.sops.placeholder."restic/secret_key";
                 };
                 extended-status = true;
                 status-file = "/var/lib/resticprofile/status";
@@ -96,5 +100,24 @@ in
           builtins.toJSON settings;
       };
     };
+
+    # services = {
+    #     sanoid = {
+    #       enable = true;
+    #       templates.default = {
+    #         hourly = 24;
+    #         daily = 7;
+    #         monthly = 0;
+    #         yearly = 0;
+    #         autosnap = true;
+    #         autoprune = true;
+    #       };
+    #       datasets.zroot = {
+    #         useTemplate = [ "default" ];
+    #         recursive = true;
+    #         processChildrenOnly = true;
+    #       };
+    #     };
+    #   };
   };
 }

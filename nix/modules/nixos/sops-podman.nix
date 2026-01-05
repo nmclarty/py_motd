@@ -21,7 +21,7 @@ in
   config = mkIf cfg.enable {
     sops.secrets."sops-podman.yaml" = {
       restartUnits = [ "sops-podman.service" ];
-      sopsFile = cfg.settings.sopsFile;
+      inherit (cfg.settings) sopsFile;
       key = "";
     };
     system.activationScripts.sops-podman = {
