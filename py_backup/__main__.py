@@ -66,7 +66,7 @@ def main() -> None:
     manager.Manager.StartUnit(b"sanoid.service", b"replace")
     print("Created long-term snapshots")
 
-    unit = Unit(b"sanoid.service")
+    unit = Unit(b"sanoid.service", _autoload=True)
     print(f"running: {unit.Unit.ActiveState}")
 
     # start each service after snapshotting
