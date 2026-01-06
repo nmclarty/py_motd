@@ -8,7 +8,7 @@ in
     enable = mkEnableOption "Enable system backup services.";
     interval = mkOption {
       type = types.str;
-      description = "Run backup services at this interval."
+      description = "Run backup services at this interval.";
     };
     settings = {
       services = mkOption {
