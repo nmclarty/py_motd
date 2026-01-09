@@ -6,6 +6,8 @@ let
     rich
     # sops-podman
     podman
+    # py-backup
+    pydantic
   ];
 in
 pkgs.mkShell {

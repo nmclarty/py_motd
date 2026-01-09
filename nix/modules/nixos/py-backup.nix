@@ -16,19 +16,21 @@ in
         default = [ ];
         description = "A list of systemd services to be stopped for snapshotting.";
       };
-      zpool = mkOption {
-        type = types.str;
-        description = "The zpool that contains all the datasets to be backed up.";
-      };
-      datasets = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "A list of zfs datasets that will be backed up.";
-      };
-      directory = mkOption {
-        type = types.str;
-        default = "/.backup";
-        description = "The directory that snapshots will be mounted into for backup.";
+      zpool = {
+        name = mkOption {
+          type = types.str;
+          description = "The zpool that contains all the datasets to be backed up.";
+        };
+        directory = mkOption {
+          type = types.str;
+          default = "/.backup";
+          description = "The directory that snapshots will be mounted into for backup.";
+        };
+        datasets = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "A list of zfs datasets that will be backed up.";
+        };
       };
     };
     restic = {
@@ -56,7 +58,7 @@ in
   config = mkIf cfg.enable {
     systemd = {
       tmpfiles.rules = [
-        "d ${cfg.settings.directory}"
+        "d ${cfg.settings.zpool.directory}"
         "f ${cfg.restic.statusFile}"
       ];
       services = {
@@ -120,8 +122,8 @@ in
                 pack-size = 64;
                 backup = {
                   tag = "automatic";
-                  source = cfg.settings.datasets;
-                  source-base = cfg.settings.directory;
+                  source = cfg.settings.zpool.datasets;
+                  source-base = cfg.settings.zpool.directory;
                   source-relative = true;
                   extended-status = true;
                 };
