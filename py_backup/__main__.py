@@ -1,5 +1,5 @@
+import logging
 from argparse import ArgumentParser
-from logging import getLogger
 from pathlib import Path
 from subprocess import run
 
@@ -12,10 +12,10 @@ def main() -> None:
     # cli configuration
     parser = ArgumentParser()
     parser.add_argument(
-        "-c",
-        "--config",
-        help="Path to the configuration file",
-        required=True,
+        "-c", "--config", help="Path to the configuration file", required=True
+    )
+    parser.add_argument(
+        "-l--log-level", help="The logging level (verbosity) to use", default="INFO"
     )
     args = parser.parse_args()
 
@@ -26,7 +26,8 @@ def main() -> None:
     Snapshot.directory = config["directory"]
 
     # configure logging
-    logger = getLogger(__name__)
+    logging.basicConfig(level=args.log_level)
+    logger = logging.getLogger(__name__)
 
     # create snapshots and backup
     with SnapshotManager(config["datasets"], config["services"]):
