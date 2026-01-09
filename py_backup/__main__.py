@@ -15,7 +15,7 @@ def main() -> None:
         "-c", "--config", help="Path to the configuration file", required=True
     )
     parser.add_argument(
-        "-l--log-level", help="The logging level (verbosity) to use", default="INFO"
+        "-l", "--log-level", help="The logging level (verbosity) to use", default="INFO"
     )
     args = parser.parse_args()
 
