@@ -23,7 +23,10 @@ class Snapshot:
         if self.path.is_mount():
             run(["umount", self.path], check=True)
 
-        if run(["zfs", "list", self.name], check=False, capture_output=True).returncode == 0:
+        if (
+            run(["zfs", "list", self.name], check=False, capture_output=True).returncode
+            == 0
+        ):
             run(["zfs", "destroy", self.name], check=True)
 
     def snapshot(self) -> None:
@@ -35,11 +38,34 @@ class Snapshot:
         run(["mount", "-t", "zfs", self.name, self.path], check=True)
 
 
-def main() -> None:
+class SnapshotManager:
+    def __init__(self, names: list[str]):
+        self.snapshot = [Snapshot(name) for name in names]
+
+    def __enter__(self):
+        print("entered manager")
+        return
+        for s in self.snapshot:
+            s.cleanup()
+            s.snapshot()
+        print("Created temporary snapshots")
+
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        print("exited manager")
+        return
+        for s in self.snapshot:
+            s.cleanup()
+        print("Cleaned up snapshots")
+
+
+def main():
     # cli configuration
     parser = ArgumentParser()
     parser.add_argument(
-        "-c", "--config", help="Path to the configuration file", required=True,
+        "-c",
+        "--config",
+        help="Path to the configuration file",
+        required=True,
     )
     args = parser.parse_args()
 
@@ -48,36 +74,26 @@ def main() -> None:
     config = yaml.load(Path(args.config))
     Snapshot.zpool = config["zpool"]
     Snapshot.directory = config["directory"]
-    snapshot = [Snapshot(name) for name in config["datasets"]]
 
-    # stop each service before snapshotting
-    if len(services := config["services"]) != 0:
-        run(["systemctl", "stop"] + services, check=True)
-        print("Stopped services")
+    with SnapshotManager(config["datasets"]):
+        print("Here!")
+        # # stop each service before snapshotting
+        # if len(services := config["services"]) != 0:
+        #     run(["systemctl", "stop"] + services, check=True)
+        #     print("Stopped services")
 
-    # create temporary snapshots for backups
-    for s in snapshot:
-        s.cleanup()
-        s.snapshot()
-    print("Created temporary snapshots")
+        # # create long-term snapshots for local recovery
+        # run(["systemctl", "start", "sanoid.service"], check=True)
+        # print("Created long-term snapshots")
 
-    # create long-term snapshots for local recovery
-    run(["systemctl", "start", "sanoid.service"], check=True)
-    print("Created long-term snapshots")
+        # # start each service after snapshotting
+        # if len(services := config["services"]) != 0:
+        #     run(["systemctl", "start"] + services, check=True)
+        #     print("Started services")
 
-    # start each service after snapshotting
-    if len(services := config["services"]) != 0:
-        run(["systemctl", "start"] + services, check=True)
-        print("Started services")
-
-    # run backups
-    run(["resticprofile", "backup"], check=True)
-    print("Finished backup")
-
-    # clean up temporary snapshots for backups
-    for s in snapshot:
-        s.cleanup()
-    print("Cleaned up snapshots")
+        # # run backups
+        # run(["resticprofile", "backup"], check=True)
+        # print("Finished backup")
 
 
 if __name__ == "__main__":
