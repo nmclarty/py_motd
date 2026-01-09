@@ -2,16 +2,21 @@ from logging import getLogger
 from pathlib import Path
 from subprocess import run
 
+from pydantic import BaseModel
+
+
+class ZpoolConfig(BaseModel):
+    name: str
+    directory: str
+    datasets: list[str]
+
 
 class Snapshot:
     """Simple class for making operations on a zfs snapshot easier."""
 
-    zpool = None
-    directory = None
-
-    def __init__(self, name: str) -> None:
-        self.name = f"{Snapshot.zpool}/{name}@backup"
-        self.path = Path(f"{Snapshot.directory}/{name}")
+    def __init__(self, name: str, zpool: str, directory: str) -> None:
+        self.name = f"{zpool}/{name}@backup"
+        self.path = Path(f"{directory}/{name}")
 
     def __str__(self) -> str:
         return f"{self.name}:{self.path}"
@@ -39,8 +44,10 @@ class SnapshotManager:
 
     logger = getLogger(__name__)
 
-    def __init__(self, datasets: list[str], services: list[str]):
-        self.snapshot = [Snapshot(name) for name in datasets]
+    def __init__(self, zpool: ZpoolConfig, services: list[str]):
+        self.snapshots = [
+            Snapshot(name, zpool.name, zpool.directory) for name in zpool.datasets
+        ]
         self.services = services
 
     def __enter__(self):
@@ -49,7 +56,7 @@ class SnapshotManager:
             run(["systemctl", "stop", *self.services], check=True)
             self.logger.info("Stopped services")
 
-        for s in self.snapshot:
+        for s in self.snapshots:
             s.cleanup()
             s.snapshot()
         self.logger.info("Created temporary snapshots")
@@ -66,6 +73,6 @@ class SnapshotManager:
         return self
 
     def __exit__(self, exc_type, exc_value, exc_tb) -> None:
-        for s in self.snapshot:
+        for s in self.snapshots:
             s.cleanup()
         self.logger.info("Cleaned up snapshots")

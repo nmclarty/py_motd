@@ -16,19 +16,21 @@ in
         default = [ ];
         description = "A list of systemd services to be stopped for snapshotting.";
       };
-      zpool = mkOption {
-        type = types.str;
-        description = "The zpool that contains all the datasets to be backed up.";
-      };
-      datasets = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "A list of zfs datasets that will be backed up.";
-      };
-      directory = mkOption {
-        type = types.str;
-        default = "/.backup";
-        description = "The directory that snapshots will be mounted into for backup.";
+      zpool = {
+        name = mkOption {
+          type = types.str;
+          description = "The zpool that contains all the datasets to be backed up.";
+        };
+        directory = mkOption {
+          type = types.str;
+          default = "/.backup";
+          description = "The directory that snapshots will be mounted into for backup.";
+        };
+        datasets = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "A list of zfs datasets that will be backed up.";
+        };
       };
     };
     restic = {
