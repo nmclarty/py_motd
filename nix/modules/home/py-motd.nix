@@ -1,4 +1,4 @@
-{ lib, inputs, config, osConfig, pkgs, perSystem, ... }:
+{ lib, inputs, config, pkgs, perSystem, ... }:
 with lib;
 let
   cfg = config.programs.py-motd;
@@ -7,12 +7,12 @@ in
   options.programs.py-motd = {
     enable = mkEnableOption "Enable Python Message of the Day";
     settings = {
-      modules = mkOption {
-        type = types.listOf types.str;
-        default = [ "update" "backup" ];
-        description = "Which modules to enable (run), and the order that they are displayed in.";
-      };
       update = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Whether to enable the module";
+        };
         source_path = mkOption {
           type = types.str;
           default = "${inputs.self}";
@@ -25,6 +25,11 @@ in
         };
       };
       backup = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Whether to enable the module";
+        };
         status_file = mkOption {
           type = types.str;
           default = "/var/lib/resticprofile/status.json";

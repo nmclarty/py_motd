@@ -9,10 +9,9 @@ from rich.console import Console
 from ruamel.yaml import YAML
 
 
-def __run_modules(config: dict) -> dict:
-    # run each module that is enabled, in that order
+def __run_modules(modules: list[str], config: dict) -> dict:
     output = {}
-    for name in config["modules"]:
+    for name in [n for n in modules if config[n] and config[n]["enable"]]:
         c = getattr(import_module(f"{__package__}.modules.{name}"), name.capitalize())
         output[c.display_name] = c(config[name]).get()
     return output
@@ -28,6 +27,13 @@ def main() -> None:
         help="Path to the configuration file",
         default="~/.config/py_motd/config.yaml",
     )
+    parser.add_argument(
+        "-m",
+        "--modules",
+        type=lambda i: i.split(","),
+        help="List of modules to run, and their order (comma separated).",
+        default="update,backup",
+    )
     args = parser.parse_args()
 
     # load the config file
@@ -38,7 +44,7 @@ def main() -> None:
     # output the combined result of each module
     console = Console()
     s = StringIO()
-    yaml.dump(__run_modules(config), s)
+    yaml.dump(__run_modules(args.modules, config), s)
     console.print(s.getvalue())
 
 

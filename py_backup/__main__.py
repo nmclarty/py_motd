@@ -7,7 +7,7 @@ from subprocess import run
 from pydantic import BaseModel, ValidationError
 from ruamel.yaml import YAML
 
-from .Snapshot import SnapshotManager, ZpoolConfig
+from .snapshot import SnapshotManager, ZpoolConfig
 
 
 class Config(BaseModel):
